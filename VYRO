@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VYRO</title>
+<style>
+:root {
+  --bg:#101018;
+  --panel:#191925;
+  --text:#f5f5fc;
+  --muted:#aaaac0;
+  --accent:#8b5cf6;
+  --border:#323247;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:system-ui,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+body.light {
+  --bg:#f5f5fa;
+  --panel:#fff;
+  --text:#191927;
+  --muted:#69697e;
+  --border:#dedeea;
+}
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 24px;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  background:var(--bg);
+}
+.logo {
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:3px;
+}
+button,input,textarea,select { font:inherit; }
+button {
+  background:var(--panel);
+  color:var(--text);
+  border:1px solid var(--border);
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}
+button:hover { border-color:var(--accent); }
+.primary {
+  background:var(--accent);
+  color:white;
+  border-color:var(--accent);
+}
+.layout {
+  display:grid;
+  grid-template-columns:210px 1fr;
+  max-width:1450px;
+  margin:auto;
+}
+aside {
+  padding:20px 12px;
+  border-right:1px solid var(--border);
+  min-height:calc(100vh - 65px);
+}
+nav button {
+  display:block;
+  width:100%;
+  text-align:left;
+  border:0;
+  margin:4px 0;
+  background:transparent;
+  color:var(--muted);
+}
+nav button.active {
+  background:var(--panel);
+  color:var(--text);
+}
+main { padding:26px; min-width:0; }
+.page { display:none; max-width:1100px; margin:auto; }
+.page.active { display:block; }
+h1 { font-size:32px; margin-bottom:6px; }
+.muted { color:var(--muted); }
+.card {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:15px;
+}
+.hero {
+  padding:26px;
+  border-radius:20px;
+  margin-bottom:20px;
+  background:linear-gradient(120deg,#5127a5,#191925 75%);
+}
+.hero h2 { font-size:27px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+.video {
+  aspect-ratio:9/12;
+  border-radius:12px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(140deg,#7c3aed,#2563eb);
+  font-size:30px;
+}
+.video.pink { background:linear-gradient(140deg,#be185d,#fb923c); }
+.video.green { background:linear-gradient(140deg,#0f766e,#a3e635); }
+.metrics {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.metric strong {
+  display:block;
+  font-size:27px;
+  margin-top:12px;
+}
+.field {
+  display:block;
+  width:100%;
+  background:var(--bg);
+  color:var(--text);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:11px;
+  margin:8px 0 15px;
+}
+.row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.setting {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.setting:last-child { border:0; }
+.setting small {
+  display:block;
+  color:var(--muted);
+}
+.banner {
+  height:155px;
+  border-radius:16px;
+  background:linear-gradient(110deg,#6d28d9,#2563eb,#0f766e);
+}
+.avatar {
+  width:75px;
+  height:75px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#302348;
+  border:5px solid var(--bg);
+  font-size:25px;
+  font-weight:bold;
+}
+.profile-head {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:-30px 15px 15px;
+}
+.notice {
+  color:var(--muted);
+  font-size:12px;
+  padding:12px;
+  background:var(--panel);
+  border-radius:10px;
+  margin-top:15px;
+}
+@media(max-width:800px) {
+  .layout { grid-template-columns:155px 1fr; }
+  main { padding:15px; }
+  .metrics { grid-template-columns:repeat(2,1fr); }
+  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:560px) {
+  header { padding:13px; }
+  .layout { display:block; }
+  aside { display:none; }
+  main { padding:13px 10px 80px; }
+  .grid { gap:9px; }
+  h1 { font-size:27px; }
+  .mobile-nav {
+    display:flex;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:var(--panel);
+    border-top:1px solid var(--border);
+    justify-content:space-around;
+    padding:8px 2px;
+    z-index:5;
+  }
+  .mobile-nav button {
+    border:0;
+    background:transparent;
+    padding:5px;
+    font-size:11px;
+  }
+}
+.mobile-nav { display:none; }
+.toast {
+  display:none;
+  position:fixed;
+  bottom:25px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--text);
+  color:var(--bg);
+  padding:12px 18px;
+  border-radius:10px;
+  z-index:10;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">◈ VYRO</div>
+  <button id="themeButton">◐ Tema</button>
+</header>
+
+<div class="layout">
+<aside>
+  <nav>
+    <button class="active" data-page="home">⌂ Ana Sayfa</button>
+    <button data-page="explore">⌕ Keşfet</button>
+    <button data-page="saved">▣ Kaydedilenler</button>
+    <button data-page="studio">▥ Creator Studio</button>
+    <button data-page="ai">✧ VYRO AI</button>
+    <button data-page="live">◉ Canlı Yayın</button>
+    <button data-page="profile">◎ Profilim</button>
+    <button data-page="settings">⚙ Ayarlar</button>
+  </nav>
+  <p class="notice">VYRO ilk web prototipi</p>
+</aside>
+
+<main>
+<section class="page active" id="home">
+  <h1>Tekrar hoş geldin 👋</h1>
+  <p class="muted">VYRO akışını keşfet.</p>
+
+  <div class="hero">
+    <p>VYRO CREATOR STUDIO</p>
+    <h2>İçeriğini geliştir. Büyümeni ölç.</h2>
+    <p class="muted">Performansını takip et ve gelişim önerilerini keşfet.</p>
+    <div class="row">
+      <button class="primary" data-go="studio">Analiz paneli</button>
+      <button data-go="ai">VYRO AI</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <article class="card">
+      <div class="video">▶</div>
+      <h3>VALORANT aim rutini</h3>
+      <p class="muted">@crosy · 12,4 B görüntülenme</p>
+      <button class="like">♡ Beğen</button>
+      <button class="save" data-title="VALORANT aim rutini">▣ Kaydet</button>
+    </article>
+    <article class="card">
+      <div class="video pink">▶</div>
+      <h3>Edit ve renkler</h3>
+      <p class="muted">@pixelvibe · 8,7 B görüntülenme</p>
+      <button class="like">♡ Beğen</button>
+      <button class="save" data-title="Edit ve renkler">▣ Kaydet</button>
+    </article>
+    <article class="card">
+      <div class="video green">▶</div>
+      <h3>En iyi klipler</h3>
+      <p class="muted">@fraglab · 5,2 B görüntülenme</p>
+      <button class="like">♡ Beğen</button>
+      <button class="save" data-title="En iyi klipler">▣ Kaydet</button>
+    </article>
+  </div>
+  <div class="notice">Bunlar örnek video kartlarıdır. Henüz gerçek video yükleme sistemi bağlı değildir.</div>
+</section>
+
+<section class="page" id="explore">
+  <h1>Keşfet</h1>
+  <p class="muted">İlgi alanlarını seç.</p>
+  <div class="card">
+    <h3>İlgi alanların</h3>
+    <div class="row" id="interests">
+      <button class="primary">🎮 Oyun</button>
+      <button>🎵 Müzik</button>
+      <button>🎬 Film ve dizi</button>
+      <button>🍿 Anime ve manga</button>
+      <button>😂 Komedi</button>
+      <button>💻 Teknoloji</button>
+      <button>🏎️ Otomobil</button>
+      <button>🏆 Spor ve e-spor</button>
+      <button>🎨 Editler</button>
+      <button>🍜 Yemek</button>
+    </div>
+    <p><button class="primary" id="saveInterests">İlgi alanlarını kaydet</button></p>
+  </div>
+</section>
+
+<section class="page" id="saved">
+  <h1>Kaydedilenler</h1>
+  <div class="card" id="savedList">Henüz video kaydetmedin.</div>
+</section>
+
+<section class="page" id="studio">
+  <h1>Creator Studio</h1>
+  <p class="muted">Örnek hesap analiz paneli.</p>
+  <div class="metrics">
+    <div class="card metric">Görüntülenme<strong>128,4 B</strong><span class="muted">↗ %18,6</span></div>
+    <div class="card metric">Takipçiler<strong>2.840</strong><span class="muted">↗ +214</span></div>
+    <div class="card metric">Ort. izlenme<strong>18,6 sn</strong><span class="muted">↗ %6,2</span></div>
+    <div class="card metric">Etkileşim<strong>%7,8</strong><span class="muted">↗ %1,1</span></div>
+  </div>
+  <div class="card">
+    <h3>VYRO AI içgörüleri</h3>
+    <p>🎯 İlk saniyelerde videonun en iyi anını göster.</p>
+    <p>📌 Kaydetme ve paylaşma oranlarını karşılaştır.</p>
+    <p>📈 Farklı içerik formatlarını ayrı ayrı ölç.</p>
+    <button class="primary" data-go="ai">Kişisel analiz iste</button>
+  </div>
+  <div class="notice">Analiz sayıları örnektir; gerçek hesabından alınmamıştır.</div>
+</section>
+
+<section class="page" id="ai">
+  <h1>VYRO AI ✧</h1>
+  <p class="muted">İçerik hedeflerine göre örnek gelişim önerileri.</p>
+  <div class="card">
+    <label>İçerik alanın
+      <select class="field" id="niche">
+        <option>Oyun / e-spor</option>
+        <option>Video editleri</option>
+        <option>Eğitim / rehber</option>
+        <option>Eğlence / komedi</option>
+        <option>Müzik</option>
+      </select>
+    </label>
+    <label>Hedefin
+      <select class="field" id="goal">
+        <option>İzlenmeyi artırmak</option>
+        <option>Takipçi kazanmak</option>
+        <option>İzlenme süresini artırmak</option>
+        <option>Etkileşimi artırmak</option>
+        <option>Canlı yayınları geliştirmek</option>
+      </select>
+    </label>
+    <label>Hesabın hakkında
+      <textarea class="field" id="notes" rows="3" placeholder="İçeriklerin ve hedeflerin..."></textarea>
+    </label>
+    <button class="primary" id="analyze">✧ Örnek analiz oluştur</button>
+    <button id="story">Başarı hikâyeleri</button>
+  </div>
+  <div id="aiResult"></div>
+  <div class="notice">Gerçek AI, hesap taraması ve kaynaklı başarı hikâyeleri için güvenli backend ve AI servisi gerekir. Bu demo gerçek bir AI servisine bağlı değildir.</div>
+</section>
+
+<section class="page" id="live">
+  <h1>Canlı yayın</h1>
+  <p class="muted">Yayın analizi paneli taslağı.</p>
+  <button class="primary" id="simulate">Demo yayını simüle et</button>
+  <div class="metrics" style="margin-top:15px">
+    <div class="card metric">İzleyici<strong id="viewers">—</strong></div>
+    <div class="card metric">Sohbet<strong id="chat">—</strong></div>
+    <div class="card metric">Yeni takipçi<strong id="follows">—</strong></div>
+    <div class="card metric">Yoğun an<strong id="peak">—</strong></div>
+  </div>
+  <div class="card" id="liveSummary">Gerçek yayın açılmaz; yalnızca demo simülasyonu.</div>
+</section>
+
+<section class="page" id="profile">
+  <h1>Profilim</h1>
+  <div class="banner"></div>
+  <div class="profile-head">
+    <div class="avatar" id="avatar">C</div>
+    <div><h2 id="displayName">CROSY</h2><p class="muted" id="handle">@crosy_1048</p><p id="bio">Oyun, edit ve gelişim yolculuğu 🎮</p></div>
+  </div>
+  <div class="card">
+    <button class="primary" id="editProfile">Profili düzenle</button>
+    <div class="setting">
+      <div><b>Vurgu rengi</b><small>Arayüz rengi</small></div>
+      <select id="accent" class="field" style="width:auto">
+        <option value="#8b5cf6">Mor</option><option value="#3b82f6">Mavi</option><option value="#ef4444">Kırmızı</option><option value="#10b981">Yeşil</option>
+      </select>
+    </div>
+  </div>
+  <div class="card" id="profileForm" hidden>
+    <label>Görünen isim<input class="field" id="nameInput" value="CROSY" maxlength="30"></label>
+    <label>Kullanıcı adı<input class="field" id="handleInput" value="crosy_1048" maxlength="24"></label>
+    <label>Biyografi<textarea class="field" id="bioInput" maxlength="160">Oyun, edit ve gelişim yolculuğu 🎮</textarea></label>
+    <button class="primary" id="saveProfile">Kaydet</button>
+  </div>
+</section>
+
+<section class="page" id="settings">
+  <h1>Ayarlar</h1>
+  <div class="card">
+    <h3>Görünüm</h3>
+    <div class="setting"><div><b>Tema</b><small>İlk açılışta sistem varsayılanı</small></div>
+      <select id="theme" class="field" style="width:auto">
+        <option value="system">Sistem varsayılanı</option>
+        <option value="dark">Koyu tema</option>
+        <option value="light">Açık tema</option>
+      </select>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Hesap ve güvenlik</h3>
+    <div class="setting"><div><b>İki aşamalı doğrulama</b><small>Ek giriş güvenliği</small></div><input type="checkbox"></div>
+    <div class="setting"><div><b>Şüpheli giriş uyarıları</b><small>Yeni cihaz oturumları</small></div><input type="checkbox" checked></div>
+    <div class="setting"><div><b>Giriş seçenekleri</b><small>Google, telefon, şifre, Riot Games ve Discord</small></div><button data-msg="Gerçek giriş için güvenli kimlik doğrulama entegrasyonu gerekir.">Ayrıntı</button></div>
+  </div>
+  <div class="card">
+    <h3>Gizlilik ve içerik</h3>
+    <div class="setting"><div><b>Özel hesap</b><small>Takip isteklerini kontrol et</small></div><input type="checkbox"></div>
+    <div class="setting"><div><b>Otomatik oynatma</b><small>Akış tercihi</small></div><input type="checkbox" checked></div>
+    <div class="setting"><div><b>VYRO Dating</b><small>Yaş doğrulaması ve ayrı gizlilik kuralları</small></div><button data-msg="Dating açılmadan önce yaş doğrulaması ve güvenlik kontrolleri gerekir.">Ayrıntı</button></div>
+    <div class="setting"><div><b>Şikâyetler ve itirazlar</b><small>Moderasyon merkezi</small></div><button data-msg="Gerçek şikâyet sistemi için sunucu gerekir.">Ayrıntı</button></div>
+  </div>
+  <div class="notice">Bu sürüm prototiptir. Gerçek hesap, mesajlaşma ve güvenlik servisleri henüz bağlı değildir.</div>
+</section>
+</main>
+</div>
+
+<nav class="mobile-nav">
+  <button data-page="home">⌂<br>Ana Sayfa</button>
+  <button data-page="explore">⌕<br>Keşfet</button>
+  <button data-page="studio">▥<br>Studio</button>
+  <button data-page="ai">✧<br>VYRO AI</button>
+  <button data-page="profile">◎<br>Profil</button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+let saved = [];
+let toastTimer;
+
+function toast(message) {
+  const el = $('#toast');
+  el.textContent = message;
+  el.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = 'none', 2600);
+}
+
+function navigate(page) {
+  $$('.page').forEach(el => el.classList.toggle('active', el.id === page));
+  $$('[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+$$('[data-page]').forEach(btn =>
+  btn.addEventListener('click', () => navigate(btn.dataset.page))
+);
+$$('[data-go]').forEach(btn =>
+  btn.addEventListener('click', () => navigate(btn.dataset.go))
+);
+
+function applyTheme(value) {
+  document.body.classList.toggle('light', value === 'light');
+  if (value === 'system') {
+    document.body.classList.toggle(
+      'light',
+      window.matchMedia('(prefers-color-scheme: light)').matches
+    );
+  }
+  localStorage.setItem('vyro-theme', value);
+  $('#theme').value = value;
+}
+applyTheme(localStorage.getItem('vyro-theme') || 'system');
+
+$('#theme').addEventListener('change', e => {
+  applyTheme(e.target.value);
+  toast('Tema tercihi kaydedildi.');
+});
+$('#themeButton').addEventListener('click', () => {
+  const current = localStorage.getItem('vyro-theme') || 'system';
+  applyTheme(current === 'dark' ? 'light' : current === 'light' ? 'system' : 'dark');
+  toast('Tema değiştirildi.');
+});
+
+$$('.like').forEach(btn => btn.addEventListener('click', () => {
+  const liked = btn.classList.toggle('primary');
+  btn.textContent = liked ? '♥ Beğenildi' : '♡ Beğen';
+}));
+
+$$('.save').forEach(btn => btn.addEventListener('click', () => {
+  const title = btn.dataset.title;
+  if (saved.includes(title)) {
+    saved = saved.filter(item => item !== title);
+    btn.textContent = '▣ Kaydet';
+  } else {
+    saved.push(title);
+    btn.textContent = '✓ Kaydedildi';
+  }
+  renderSaved();
+}));
+
+function renderSaved() {
+  const list = $('#savedList');
+  if (!saved.length) {
+    list.textContent = 'Henüz video kaydetmedin.';
+    return;
+  }
+  list.innerHTML = '';
+  saved.forEach(title => {
+    const row = document.createElement('p');
+    row.textContent = title + ' ';
+    const remove = document.createElement('button');
+    remove.textContent = 'Kaldır';
+    remove.addEventListener('click', () => {
+      saved = saved.filter(item => item !== title);
+      $$('.save').forEach(btn => {
+        if (btn.dataset.title === title) btn.textContent = '▣ Kaydet';
+      });
+      renderSaved();
+    });
+    row.appendChild(remove);
+    list.appendChild(row);
+  });
+}
+
+$$('#interests button').forEach(btn => btn.addEventListener('click', () =>
+  btn.classList.toggle('primary')
+));
+$('#saveInterests').addEventListener('click', () => {
+  const selected = $$('#interests .primary').map(btn => btn.textContent);
+  localStorage.setItem('vyro-interests', JSON.stringify(selected));
+  toast('İlgi alanların kaydedildi.');
+});
+const oldInterests = JSON.parse(localStorage.getItem('vyro-interests') || 'null');
+if (oldInterests) {
+  $$('#interests button').forEach(btn =>
+    btn.classList.toggle('primary', oldInterests.includes(btn.textContent))
+  );
+}
+
+$('#accent').addEventListener('change', e => {
+  document.documentElement.style.setProperty('--accent', e.target.value);
+});
+$('#editProfile').addEventListener('click', () => {
+  $('#profileForm').hidden = !$('#profileForm').hidden;
+});
+$('#saveProfile').addEventListener('click', () => {
+  const name = $('#nameInput').value.trim() || 'VYRO Kullanıcısı';
+  const handle = $('#handleInput').value.toLowerCase().replace(/[^a-z0-9._]/g,'') || 'vyro_user';
+  $('#displayName').textContent = name;
+  $('#handle').textContent = '@' + handle;
+  $('#avatar').textContent = name[0].toUpperCase();
+  $('#bio').textContent = $('#bioInput').value.slice(0,160);
+  $('#profileForm').hidden = true;
+  toast('Profil demo olarak güncellendi.');
+});
+
+$$('[data-msg]').forEach(btn =>
+  btn.addEventListener('click', () => toast(btn.dataset.msg))
+);
+
+$('#analyze').addEventListener('click', () => {
+  const niche = $('#niche').value;
+  const goal = $('#goal').value;
+  const tips = niche.includes('Oyun')
+    ? ['En iyi anı ilk 1–2 saniyede göster.',
+       'Tek videoda tek bir taktik anlat.',
+       'Klip ve rehber performanslarını ayrı ölç.']
+    : ['Videonun ana fikrini başta netleştir.',
+       'Tek izleyici ihtiyacına odaklan.',
+       'Kaydetme ve paylaşma oranlarını karşılaştır.'];
+
+  const result = document.createElement('div');
+  result.className = 'card';
+  const heading = document.createElement('h2');
+  heading.textContent = 'Demo analiz: ' + goal;
+  result.appendChild(heading);
+
+  tips.forEach((tip, i) => {
+    const p = document.createElement('p');
+    p.textContent = (i + 1) + '. ' + tip;
+    result.appendChild(p);
+  });
+
+  const note = document.createElement('p');
+  note.className = 'notice';
+  note.textContent = 'Bu, örnek kurallardan oluşturulan bir yanıttır. Gerçek hesap taraması veya AI çağrısı yapılmadı.';
+  result.appendChild(note);
+
+  $('#aiResult').replaceChildren(result);
+});
+
+$('#story').addEventListener('click', () => {
+  $('#aiResult').textContent =
+    'Gerçek sürümde doğrulanabilir kaynaklarla desteklenen içerik üreticisi hikâyeleri gösterilecek. Bu prototip kaynak araştırması yapmaz ve gerçek kişi hikâyesi uydurmaz.';
+});
+
+let live = false;
+$('#simulate').addEventListener('click', () => {
+  live = !live;
+  $('#viewers').textContent = live ? '124' : '—';
+  $('#chat').textContent = live ? '86' : '—';
+  $('#follows').textContent = live ? '12' : '—';
+  $('#peak').textContent = live ? '02:14' : '—';
+  $('#liveSummary').textContent = live
+    ? 'Demo verileri gösteriliyor. Gerçek yayın açılmadı.'
+    : 'Gerçek yayın açılmaz; yalnızca demo simülasyonu.';
+  $('#simulate').textContent = live ? 'Simülasyonu sıfırla' : 'Demo yayını simüle et';
+});
+
+$('#search').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    navigate('explore');
+    toast('Demo araması. Gerçek arama servisi henüz bağlı değil.');
+  }
+});
+</script>
+</body>
+</html>
