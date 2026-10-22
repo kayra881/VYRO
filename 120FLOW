@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow120 | Free 120 FPS Converter</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#f3f7ff;font-family:Arial,sans-serif}
+main{max-width:760px;margin:45px auto;padding:20px}
+header{text-align:center;margin-bottom:28px}
+.logo{font-size:48px;font-weight:900;letter-spacing:-2px}
+.logo span{color:#5de5f1}
+p{color:#a8b7ce;line-height:1.6}
+.panel{background:#111a2b;border:1px solid #263650;border-radius:18px;padding:24px;margin:18px 0}
+.drop{display:block;text-align:center;border:2px dashed #3a5977;border-radius:14px;padding:28px 12px}
+input,select,button{max-width:100%;font-size:15px}
+label{display:block;margin:20px 0 9px}
+select{width:100%;padding:14px;background:#091321;color:white;border:1px solid #344660;border-radius:10px}
+button{width:100%;padding:15px;border:0;border-radius:10px;background:#5de5f1;color:#07111b;font-weight:bold;cursor:pointer;margin-top:22px}
+button:disabled{opacity:.55}
+#status{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:18px}
+#preview{display:none;width:100%;max-height:300px;margin-top:15px}
+a{color:#5de5f1}
+small{color:#9aabc5}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="logo">Flow<span>120</span></div>
+<p>Free Video Frame Interpolation<br>Videonu yükle. FPS seç. Dönüştür.</p>
+</header>
+
+<section class="panel">
+<label class="drop">
+<strong>Video dosyanı seç</strong><br><br>
+<input id="file" type="file" accept="video/*">
+</label>
+
+<video id="preview" controls></video>
+<p id="info">Henüz dosya seçilmedi.</p>
+
+<label for="fps">Hedef FPS</label>
+<select id="fps">
+<option value="60">60 FPS</option>
+<option value="120" selected>120 FPS</option>
+</select>
+
+<label for="resolution">Çözünürlük</label>
+<select id="resolution">
+<option value="source">Orijinal</option>
+<option value="1080">1080p</option>
+</select>
+
+<button id="start">120 FPS'ye dönüştür</button>
+<div id="status">Hazır.</div>
+<div id="result"></div>
+</section>
+
+<section class="panel">
+<strong>Nasıl çalışır?</strong>
+<p><small>İşlem tarayıcıda yapılır. FFmpeg WebAssembly, CDN üzerinden indirilir; bilgisayara kurulum gerekmez. Bu sürüm hareket telafili kare interpolasyonu kullanır, RIFE AI kullanmaz. Büyük videolar telefonlarda veya düşük bellekli cihazlarda başarısız olabilir.</small></p>
+</section>
+</main>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+let selectedFile = null;
+let previewURL = null;
+
+$("file").addEventListener("change", () => {
+  selectedFile = $("file").files[0] || null;
+  $("result").replaceChildren();
+
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = null;
+
+  if (!selectedFile) {
+    $("info").textContent = "Henüz dosya seçilmedi.";
+    $("preview").style.display = "none";
+    return;
+  }
+
+  previewURL = URL.createObjectURL(selectedFile);
+  $("preview").src = previewURL;
+  $("preview").style.display = "block";
+  $("info").textContent =
+    selectedFile.name + " • " +
+    (selectedFile.size / 1024 / 1024).toFixed(1) + " MB";
+  $("status").textContent = "Video hazır.";
+});
+
+$("start").addEventListener("click", async () => {
+  if (!selectedFile) {
+    $("status").textContent = "Önce bir video seç.";
+    return;
+  }
+
+  const button = $("start");
+  button.disabled = true;
+  $("result").replaceChildren();
+
+  let ffmpeg;
+  let outputURL;
+
+  try {
+    $("status").textContent = "Video motoru indiriliyor...";
+
+    const { FFmpeg } = await import(
+      "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js"
+    );
+    const { toBlobURL } = await import(
+      "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js"
+    );
+
+    ffmpeg = new FFmpeg();
+
+    ffmpeg.on("log", ({ message }) => {
+      if (message) $("status").textContent =
+        "Dönüştürme sürüyor...\n" + message.slice(-350);
+    });
+
+    ffmpeg.on("progress", ({ progress }) => {
+      if (Number.isFinite(progress)) {
+        $("status").textContent =
+          "Dönüştürme sürüyor: " +
+          Math.max(0, Math.min(100, Math.round(progress * 100))) + "%";
+      }
+    });
+
+    const base =
+      "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
+
+    await ffmpeg.load({
+      coreURL: await toBlobURL(base + "/ffmpeg-core.js", "text/javascript"),
+      wasmURL: await toBlobURL(base + "/ffmpeg-core.wasm", "application/wasm")
+    });
+
+    $("status").textContent = "Video belleğe yükleniyor...";
+    await ffmpeg.writeFile(
+      "input_video",
+      new Uint8Array(await selectedFile.arrayBuffer())
+    );
+
+    const fps = Number($("fps").value);
+    let filter =
+      `minterpolate=fps=${fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1`;
+
+    if ($("resolution").value === "1080") {
+      filter += ",scale=-2:1080";
+    }
+
+    $("status").textContent =
+      `Video ${fps} FPS'ye dönüştürülüyor. Lütfen bekle...`;
+
+    const exitCode = await ffmpeg.exec([
+      "-i", "input_video",
+      "-vf", filter,
+      "-c:v", "libx264",
+      "-preset", "ultrafast",
+      "-crf", "20",
+      "-pix_fmt", "yuv420p",
+      "-c:a", "aac",
+      "-b:a", "192k",
+      "-movflags", "+faststart",
+      "flow120.mp4"
+    ]);
+
+    if (exitCode !== 0) {
+      throw new Error("FFmpeg dönüştürme işlemini tamamlayamadı.");
+    }
+
+    const output = await ffmpeg.readFile("flow120.mp4");
+    const blob = new Blob([output], { type: "video/mp4" });
+    outputURL = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = outputURL;
+    link.download = `Flow120_${fps}FPS.mp4`;
+    link.textContent = "⬇ Videoyu indir";
+    link.style.display = "inline-block";
+    link.style.marginTop = "20px";
+    $("result").appendChild(link);
+
+    $("status").textContent = "Dönüştürme tamamlandı!";
+  } catch (error) {
+    console.error(error);
+    $("status").textContent =
+      "Hata: " + (error?.message || String(error)) +
+      "\nİnternet bağlantısını kontrol et veya daha küçük bir video dene.";
+    if (outputURL) URL.revokeObjectURL(outputURL);
+  } finally {
+    if (ffmpeg) {
+      try { await ffmpeg.terminate(); } catch {}
+    }
+    button.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
